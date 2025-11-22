@@ -417,8 +417,15 @@
                     // Sort rooms by name (A-Z)
                     rooms.sort((a, b) => a.name.localeCompare(b.name));
 
-                    roomsListEl.innerHTML = rooms.map(room => `
+                    roomsListEl.innerHTML = rooms.map(room => {
+                        // Show delete button only if the current user is the author
+                        const deleteButtonHtml = room.createdBy === currentUserId ?
+                            `<button class="delete-room-btn text-xs text-red-600 hover:underline float-right font-semibold" data-room-id="${room.id}">[Delete]</button>`
+                            : '';
+                        
+                        return `
                         <div class="bg-gray-300 p-4 shadow-md border-2 border-t-gray-100 border-l-gray-100 border-b-gray-500 border-r-gray-500">
+                            ${deleteButtonHtml}
                             <a href="#" class="block room-link" data-room-id="${room.id}" data-room-name="${room.name}">
                                 <h3 class="text-xl font-semibold text-blue-800 hover:underline">${room.name}</h3>
                                 <p class="text-sm text-gray-700">
@@ -426,7 +433,8 @@
                                 </p>
                             </a>
                         </div>
-                    `).join('');
+                        `;
+                    }).join('');
 
                 }, (error) => {
                     showError("Failed to load rooms: " + error.message);
@@ -702,6 +710,52 @@
             }
         }
 
+        /**
+         * Deletes a room, all its posts, and all their comments.
+         * @param {string} roomId - The ID of the room to delete.
+         */
+        async function deleteRoom(roomId) {
+            if (!roomId) return;
+            
+            try {
+                const deletePromises = [];
+                
+                // 1. Find all posts in the room
+                const postsQuery = query(collection(db, POSTS_COLLECTION), where("roomId", "==", roomId));
+                const postsSnapshot = await getDocs(postsQuery);
+
+                // 2. For each post, find and queue its comments for deletion
+                for (const postDoc of postsSnapshot.docs) {
+                    const postId = postDoc.id;
+                    const commentsQuery = query(collection(db, COMMENTS_COLLECTION), where("postId", "==", postId));
+                    const commentsSnapshot = await getDocs(commentsQuery);
+                    
+                    commentsSnapshot.forEach((commentDoc) => {
+                        deletePromises.push(deleteDoc(commentDoc.ref));
+                    });
+                    
+                    // 3. Queue the post for deletion
+                    deletePromises.push(deleteDoc(postDoc.ref));
+                }
+                
+                // 4. Queue the room itself for deletion
+                const roomDocRef = doc(db, ROOMS_COLLECTION, roomId);
+                deletePromises.push(deleteDoc(roomDocRef));
+                
+                // 5. Run all deletions
+                await Promise.all(deletePromises);
+                
+                // If we are in the deleted room, navigate back
+                if (currentRoomId === roomId) {
+                    navigateToRooms();
+                }
+                
+            } catch (error) {
+                showError("Failed to delete room: " + error.message);
+                console.error("Error deleting room: ", error);
+            }
+        }
+
 
         /**
          * Handles clicks on dynamic elements (rooms, posts).
@@ -741,15 +795,29 @@
             }
 
             // Handle Delete Post
-            const deleteBtn = target.closest('.delete-post-btn');
-            if (deleteBtn) {
+            const deletePostBtn = target.closest('.delete-post-btn');
+            if (deletePostBtn) {
                 e.preventDefault();
                 e.stopPropagation(); // Stop it from triggering the post link click
-                const postId = deleteBtn.dataset.postId;
+                const postId = deletePostBtn.dataset.postId;
                 
                 // Show confirmation
                 showConfirmModal("Are you sure you want to delete this post? This will also delete all comments.", () => {
                     deletePost(postId);
+                });
+                return;
+            }
+
+            // Handle Delete Room
+            const deleteRoomBtn = target.closest('.delete-room-btn');
+            if (deleteRoomBtn) {
+                e.preventDefault();
+                e.stopPropagation(); // Stop it from triggering the room link click
+                const roomId = deleteRoomBtn.dataset.roomId;
+                
+                // Show confirmation
+                showConfirmModal("Are you sure you want to delete this room? This will delete ALL posts and comments inside it.", () => {
+                    deleteRoom(roomId);
                 });
                 return;
             }
