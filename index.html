@@ -146,6 +146,39 @@
             border-style: inset;
         }
 
+        /* NEW: Button for favoriting */
+        .button-fav {
+            background: #fff;
+            border: 2px outset #ccc;
+            color: #daa520; /* Goldenrod color for star */
+            font-size: 1.1em;
+            padding: 2px 6px;
+            margin-left: 4px;
+        }
+        .button-fav:hover {
+            background: #f0f0f0;
+        }
+        .button-fav:disabled {
+            color: #999;
+            background: #f9f9f9;
+            cursor: not-allowed;
+        }
+        
+        /* NEW: Button for removing favorite */
+        .button-remove-fav {
+            background: #fee;
+            border: 2px outset #ccc;
+            color: #d00;
+            font-family: 'VT323', monospace;
+            font-size: 0.9em;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+        .button-remove-fav:hover {
+            background: #fdd;
+        }
+
+
         .feature-box {
             background: #f9f9f9;
             border: 1px solid #ccc;
@@ -168,6 +201,19 @@
         .sidebar-box p {
             font-size: 0.9em;
             margin: 0 0 10px 0;
+        }
+
+        /* NEW: Auth status box */
+        #auth-status {
+            background: #ffc;
+            border: 2px dashed #cc9;
+            font-size: 1em;
+            padding: 10px;
+            word-break: break-all;
+        }
+        #auth-status p {
+            margin: 0;
+            font-weight: bold;
         }
 
         .sidebar-gif {
@@ -195,7 +241,7 @@
             padding: 5px;
         }
 
-        #server-list {
+        #server-list, #favorite-server-list {
             list-style-type: none;
             padding-left: 0;
             margin: 0;
@@ -237,6 +283,17 @@
             display: block;
             margin-top: 4px;
         }
+
+        /* NEW: Favorite list styles */
+        #favorite-server-list .server-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        #favorite-server-list .server-info {
+            flex-grow: 1;
+        }
+
 
         .footer {
             text-align: center;
@@ -363,10 +420,11 @@
                     </p>
                     <p>
                         This page is a real portal. The list on the right is a
-                        <strong>live feed</strong> of actual <strong>Mastodon</strong> servers you can join.
-                        Click "View Feed" to see what's happening on a server right now!
+                        <strong>live feed</strong> of actual <strong>Fediverse</strong> servers you can join.
+                        Click "View Feed" to see what's happening on a server right now, or
+                        <strong>'☆' to save it to your favorites!</strong>
                     </p>
-                    <a href="#servers" class="button">Browse Mastodon Servers &rarr;</a>
+                    <a href="#servers" class="button">Browse Servers &rarr;</a>
                 </section>
 
                 <section id="features">
@@ -375,8 +433,9 @@
                     <div class="feature-box">
                         <h3>[ 1 ] Choose Your Community</h3>
                         <p>
-                            Use the list on the right to find a Mastodon server.
-                            Click "View Feed" to sample the public conversation.
+                            Use the list on the right to find a server.
+                            Click "View Feed" to sample the public conversation, or '☆'
+                            to add it to your "My Favorites" list.
                         </p>
                     </div>
 
@@ -407,13 +466,29 @@
                      class="sidebar-gif"
                      onerror="this.style.display='none'">
 
+                <!-- NEW: Auth Status -->
+                <div class="sidebar-box" id="auth-status">
+                    <p>Connecting...</p>
+                </div>
+
+                <!-- NEW: Favorite Servers Box -->
+                <div class="sidebar-box" id="favorite-servers-box">
+                    <h3>My Favorite Servers</h3>
+                    <div class="server-list-container">
+                        <ul id="favorite-server-list">
+                            <li>Loading favorites...</li>
+                        </ul>
+                    </div>
+                </div>
+
+
                 <!-- FUNCTIONAL SERVER BROWSER -->
                 <div class="sidebar-box" id="servers">
                     <!-- UPDATED TEXT -->
                     <h3>Find a Fediverse Server</h3>
                     <p>Live list of (English-speaking) servers.
                        Search by name or description.
-                    </p>
+                    </V>
                     <input type="text" id="server-search" placeholder="Filter Fediverse servers...">
                     
                     <div class="server-list-container">
@@ -438,14 +513,14 @@
         <footer class="footer">
             <p>Built by the community.</p>
             <p>This is a functional portal to the Fediverse. Server list
-               powered by the <a href="https://instances.social/api/1.0/" target="_blank">instances.social API</a>
-               via <a href="https://allorigins.win/" target="_blank">allorigins.win</a>.
+                powered by the <a href="https://instances.social/api/1.0/" target="_blank">instances.social API</a>
+                via <a href="https://allorigins.win/" target="_blank">allorigins.win</a>.
             </p>
         </footer>
 
     </div>
     
-    <!-- NEW: The Modal (Popup) HTML -->
+    <!-- NEW: The Modal (Popup) HTML (Unchanged) -->
     <div id="feed-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -459,11 +534,46 @@
     </div>
 
 
-    <!-- JAVASCRIPT for Server List & Modal Functionality -->
-    <script>
+    <!-- NEW: Import Firebase services -->
+    <script type="module">
+        // These global variables are provided by the environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "DEFAULT_API_KEY", authDomain: "DEFAULT_AUTH_DOMAIN", projectId: "DEFAULT_PROJECT_ID" };
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Import functions from the Firebase SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInAnonymously, 
+            signInWithCustomToken, 
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc, 
+            updateDoc, 
+            arrayUnion, 
+            arrayRemove,
+            onSnapshot,
+            setLogLevel
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        // Enable debug logging for Firestore
+        setLogLevel('Debug');
+
+        // --- Main App Logic ---
         document.addEventListener('DOMContentLoaded', () => {
             const serverList = document.getElementById('server-list');
             const serverSearch = document.getElementById('server-search');
+            const favoriteServerList = document.getElementById('favorite-server-list');
+            const authStatus = document.getElementById('auth-status');
             
             // Modal elements
             const modal = document.getElementById('feed-modal');
@@ -475,18 +585,146 @@
             const PROXY_URL = 'https://api.allorigins.win/raw?url=';
             const FETCH_URL = PROXY_URL + encodeURIComponent(API_URL);
             
-            let allServers = []; 
-            
-            // --- NEW: Function to safely sanitize HTML content ---
-            // This prevents XSS attacks by removing script tags
+            let allServers = []; // Cached list of all servers from API
+            let currentFavorites = []; // Cached list of user's favorites
+            let userId = null;
+            let userDocRef = null;
+            let unsubscribeFavorites = () => {}; // Function to detach listener
+
+            // --- Authentication ---
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    console.log("User is signed in:", user.uid);
+                    userId = user.uid;
+                    
+                    // **** FIX: Added '/data' to the end of the path ****
+                    // This creates a 6-segment path pointing to a document,
+                    // rather than a 5-segment path pointing to a collection.
+                    userDocRef = doc(db, `artifacts/${appId}/users/${userId}/fediversePortal/data`);
+                    
+                    authStatus.innerHTML = `<p>Your User ID:<br>${userId}</p>`;
+                    
+                    // Detach any old listener
+                    unsubscribeFavorites(); 
+                    
+                    // Set up listener for this user's favorites
+                    setupFavoritesListener();
+                    
+                    // Fetch servers (we only do this once auth is ready)
+                    await fetchServers();
+
+                } else {
+                    console.log("User is signed out. Attempting to sign in...");
+                    authStatus.innerHTML = `<p>Connecting...</p>`;
+                    userId = null;
+                    userDocRef = null;
+                    unsubscribeFavorites(); // Detach listener
+                    
+                    try {
+                        if (initialAuthToken) {
+                            await signInWithCustomToken(auth, initialAuthToken);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (error) {
+                        console.error("Error signing in:", error);
+                        authStatus.innerHTML = `<p>Connection failed. Please refresh.</p>`;
+                    }
+                }
+            });
+
+            // --- Firestore Favorites Listener ---
+            function setupFavoritesListener() {
+                if (!userDocRef) return;
+
+                unsubscribeFavorites = onSnapshot(userDocRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        currentFavorites = docSnap.data().favorites || [];
+                        console.log("Favorites updated:", currentFavorites);
+                    } else {
+                        // No document yet, favorites list is empty
+                        currentFavorites = [];
+                        console.log("No favorites document found.");
+                    }
+                    renderFavorites(currentFavorites);
+                    // After favorites are loaded/updated, re-render the main server list
+                    // to update the "Favorite" button states
+                    renderServers(allServers);
+                }, (error) => {
+                    console.error("Error listening to favorites:", error);
+                    favoriteServerList.innerHTML = '<li>Error loading favorites.</li>';
+                });
+            }
+
+            // --- NEW: Render Favorites List ---
+            function renderFavorites(favorites) {
+                favoriteServerList.innerHTML = '';
+                if (favorites.length === 0) {
+                    favoriteServerList.innerHTML = '<li>No favorites yet. Click ☆ to add one!</li>';
+                    return;
+                }
+
+                favorites.forEach(server => {
+                    const li = document.createElement('li');
+                    li.className = 'server-list-item';
+
+                    const infoDiv = document.createElement('div');
+                    infoDiv.className = 'server-info';
+
+                    const link = document.createElement('a');
+                    link.href = `https://` + server.name;
+                    link.textContent = server.name;
+                    link.target = '_blank';
+
+                    const description = document.createElement('p');
+                    description.textContent = server.description;
+                    
+                    infoDiv.appendChild(link);
+                    infoDiv.appendChild(description);
+                    
+                    const removeButton = document.createElement('button');
+                    removeButton.className = 'button-remove-fav';
+                    removeButton.textContent = 'Remove';
+                    removeButton.onclick = () => removeFavorite(server); // Pass the exact object to remove
+
+                    li.appendChild(infoDiv);
+                    li.appendChild(removeButton);
+                    favoriteServerList.appendChild(li);
+                });
+            }
+
+            // --- NEW: Add/Remove Favorite Functions ---
+            async function addFavorite(serverName, serverDescription) {
+                if (!userDocRef) return;
+                const serverData = { name: serverName, description: serverDescription || "No description." };
+                try {
+                    await setDoc(userDocRef, { 
+                        favorites: arrayUnion(serverData) 
+                    }, { merge: true }); // Use set with merge to create doc if it doesn't exist
+                    console.log("Added favorite:", serverName);
+                } catch (error) {
+                    console.error("Error adding favorite:", error);
+                }
+            }
+
+            async function removeFavorite(serverObject) {
+                if (!userDocRef) return;
+                try {
+                    await updateDoc(userDocRef, {
+                        favorites: arrayRemove(serverObject)
+                    });
+                    console.log("Removed favorite:", serverObject.name);
+                } catch (error) {
+                    console.error("Error removing favorite:", error);
+                }
+            }
+
+
+            // --- Function to safely sanitize HTML content ---
             function sanitizeHTML(html) {
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
-                // Remove all script tags
-                doc.querySelectorAll('script').forEach(script => script.remove());
-                // Remove all style tags
-                doc.querySelectorAll('style').forEach(style => style.remove());
-                // Remove all event handlers (like onerror, onload)
+                doc.querySelectorAll('script, style').forEach(el => el.remove());
                 doc.querySelectorAll('*').forEach(el => {
                     for (let i = 0; i < el.attributes.length; i++) {
                         const attrName = el.attributes[i].name;
@@ -498,7 +736,7 @@
                 return doc.body.innerHTML;
             }
 
-            // --- NEW: Function to show the modal and fetch the public feed ---
+            // --- Function to show the modal and fetch the public feed ---
             async function showPublicFeed(domain) {
                 modal.style.display = 'block';
                 modalTitle.textContent = `Public Feed: ${domain}`;
@@ -513,7 +751,15 @@
                         throw new Error(`Server returned status ${response.status}`);
                     }
                     const dataText = await response.text();
-                    const feedData = JSON.parse(dataText);
+                    
+                    // Handle potential non-JSON responses from the proxy on error
+                    let feedData;
+                    try {
+                        feedData = JSON.parse(dataText);
+                    } catch (jsonError) {
+                         throw new Error(`Failed to parse response from server. It might be down or blocking requests.`);
+                    }
+
 
                     if (!feedData || feedData.length === 0) {
                         modalBody.innerHTML = '<p>No public posts found.</p>';
@@ -548,7 +794,7 @@
                 }
             }
             
-            // --- NEW: Event listeners to close the modal ---
+            // --- Event listeners to close the modal ---
             modalClose.onclick = () => {
                 modal.style.display = 'none';
             };
@@ -565,10 +811,17 @@
             function renderServers(serversToRender) {
                 serverList.innerHTML = ''; 
                 
-                if (serversToRender.length === 0) {
+                if (serversToRender.length === 0 && allServers.length > 0) {
                     serverList.innerHTML = '<li>No matching servers found.</li>';
                     return;
                 }
+                if (allServers.length === 0) {
+                     serverList.innerHTML = '<li>Loading servers...</li>';
+                    return;
+                }
+
+                // Get a list of favorite names for easy checking
+                const favoriteNames = currentFavorites.map(f => f.name);
 
                 serversToRender.forEach(server => {
                     if (!server.info) {
@@ -584,14 +837,34 @@
                     link.textContent = server.name;
                     link.target = '_blank';
                     
-                    // --- NEW: The "View Feed" Button ---
+                    // 2. The "View Feed" Button
                     const feedButton = document.createElement('button');
                     feedButton.className = 'button-small';
                     feedButton.textContent = 'View Feed';
                     feedButton.onclick = () => {
-                        // Pass the server's domain to the new function
                         showPublicFeed(server.name);
                     };
+
+                    // 3. NEW: The "Favorite" Button
+                    const favButton = document.createElement('button');
+                    favButton.className = 'button-small button-fav';
+                    
+                    const isFavorited = favoriteNames.includes(server.name);
+                    
+                    if (isFavorited) {
+                        favButton.textContent = '★'; // Solid star
+                        favButton.title = 'Already in favorites';
+                        favButton.disabled = true;
+                    } else {
+                        favButton.textContent = '☆'; // Outline star
+                        favButton.title = 'Add to favorites';
+                        favButton.disabled = false;
+                        favButton.onclick = () => {
+                            const description = server.info?.short_description || 'No description.';
+                            addFavorite(server.name, description);
+                        };
+                    }
+
 
                     const description = document.createElement('p');
                     description.textContent = server.info?.short_description || 'No description available.';
@@ -600,7 +873,8 @@
                     stats.textContent = `${server.users} users`;
                     
                     li.appendChild(link);
-                    li.appendChild(feedButton); // Add the new button
+                    li.appendChild(feedButton); // Add the feed button
+                    li.appendChild(favButton); // Add the favorite button
                     li.appendChild(description);
                     li.appendChild(stats);
                     
@@ -608,7 +882,7 @@
                 });
             }
 
-            // --- fetchServers function (unchanged from last time) ---
+            // --- fetchServers function (mostly unchanged) ---
             async function fetchServers() {
                 try {
                     const response = await fetch(FETCH_URL);
@@ -620,14 +894,17 @@
                     
                     const allInstances = data.instances || []; 
 
-                    // --- FILTER REMOVED ---
-                    // Instead of filtering for Mastodon, we'll just show all servers.
                     allServers = allInstances.filter(server => server.info); // Just make sure it has an info object
                     
                     if (allServers.length > 0) {
-                        renderServers(allServers);
+                        // Pass the current list of servers to be rendered
+                        const searchTerm = serverSearch.value.toLowerCase();
+                        if (searchTerm) {
+                            filterAndRenderServers(searchTerm);
+                        } else {
+                            renderServers(allServers);
+                        }
                     } else {
-                        // This message will now only show if the API itself returns an empty list
                         serverList.innerHTML = '<li>No open servers found at this time.</li>';
                     }
 
@@ -637,22 +914,23 @@
                 }
             }
 
-            // --- Search event listener (unchanged) ---
-            serverSearch.addEventListener('keyup', () => {
-                const searchTerm = serverSearch.value.toLowerCase();
-                
-                // This filter now searches through ALL servers, not just Mastodon
+            // --- NEW: Helper function to filter and render
+            function filterAndRenderServers(searchTerm) {
                 const filteredServers = allServers.filter(server => {
                     const domainMatch = server.name.toLowerCase().includes(searchTerm);
                     const descriptionMatch = (server.info?.short_description || '').toLowerCase().includes(searchTerm);
                     return domainMatch || descriptionMatch;
                 });
-
                 renderServers(filteredServers);
+            }
+
+            // --- Search event listener ---
+            serverSearch.addEventListener('keyup', () => {
+                const searchTerm = serverSearch.value.toLowerCase();
+                filterAndRenderServers(searchTerm);
             });
 
-            // Initial fetch
-            fetchServers();
+            // Initial auth check triggers everything else
         });
     </script>
 
