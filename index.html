@@ -409,11 +409,12 @@
 
                 <!-- FUNCTIONAL SERVER BROWSER -->
                 <div class="sidebar-box" id="servers">
-                    <h3>Find a Mastodon Server</h3>
-                    <p>Live list of (English-speaking, <strong>Mastodon-only</strong>) servers.
+                    <!-- UPDATED TEXT -->
+                    <h3>Find a Fediverse Server</h3>
+                    <p>Live list of (English-speaking) servers.
                        Search by name or description.
                     </p>
-                    <input type="text" id="server-search" placeholder="Filter Mastodon servers...">
+                    <input type="text" id="server-search" placeholder="Filter Fediverse servers...">
                     
                     <div class="server-list-container">
                         <ul id="server-list">
@@ -619,15 +620,15 @@
                     
                     const allInstances = data.instances || []; 
 
-                    allServers = allInstances.filter(server => {
-                        const softwareName = server.info?.software?.name || '';
-                        return softwareName.toLowerCase() === 'mastodon';
-                    });
+                    // --- FILTER REMOVED ---
+                    // Instead of filtering for Mastodon, we'll just show all servers.
+                    allServers = allInstances.filter(server => server.info); // Just make sure it has an info object
                     
                     if (allServers.length > 0) {
                         renderServers(allServers);
                     } else {
-                        serverList.innerHTML = '<li>No open Mastodon servers found at this time.</li>';
+                        // This message will now only show if the API itself returns an empty list
+                        serverList.innerHTML = '<li>No open servers found at this time.</li>';
                     }
 
                 } catch (error) {
@@ -640,6 +641,7 @@
             serverSearch.addEventListener('keyup', () => {
                 const searchTerm = serverSearch.value.toLowerCase();
                 
+                // This filter now searches through ALL servers, not just Mastodon
                 const filteredServers = allServers.filter(server => {
                     const domainMatch = server.name.toLowerCase().includes(searchTerm);
                     const descriptionMatch = (server.info?.short_description || '').toLowerCase().includes(searchTerm);
