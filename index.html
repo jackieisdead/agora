@@ -582,8 +582,11 @@
             const modalClose = document.getElementById('modal-close');
             
             const API_URL = 'https://instances.social/api/1.0/instances/list?count=100&min_users=20&sort_by=users&sort_order=desc&include_down=false&include_closed=false&language=en';
-            const PROXY_URL = 'https://api.allorigins.win/raw?url=';
-            const FETCH_URL = PROXY_URL + encodeURIComponent(API_URL);
+            
+            // **** FIX: Swapped to a different CORS proxy ****
+            const PROXY_URL = 'https://api.codetabs.com/v1/proxy?quest=';
+            // **** FIX: This proxy does not require URL encoding ****
+            const FETCH_URL = PROXY_URL + API_URL;
             
             let allServers = []; // Cached list of all servers from API
             let currentFavorites = []; // Cached list of user's favorites
@@ -597,9 +600,7 @@
                     console.log("User is signed in:", user.uid);
                     userId = user.uid;
                     
-                    // **** FIX: Added '/data' to the end of the path ****
-                    // This creates a 6-segment path pointing to a document,
-                    // rather than a 5-segment path pointing to a collection.
+                    // Creates a 6-segment path pointing to a document
                     userDocRef = doc(db, `artifacts/${appId}/users/${userId}/fediversePortal/data`);
                     
                     authStatus.innerHTML = `<p>Your User ID:<br>${userId}</p>`;
@@ -628,7 +629,7 @@
                         }
                     } catch (error) {
                         console.error("Error signing in:", error);
-                        authStatus.innerHTML = `<p>Connection failed. Please refresh.</p>`;
+                        authStatus.innerHTML = `<p><strong>Connection failed:</strong><br>${error.message}</p>`;
                     }
                 }
             });
@@ -743,7 +744,9 @@
                 modalBody.innerHTML = '<p>Fetching public posts...</p>';
                 
                 const publicFeedUrl = `https://${domain}/api/v1/timelines/public?limit=10`;
-                const proxiedFeedUrl = PROXY_URL + encodeURIComponent(publicFeedUrl);
+                
+                // **** FIX: Use new proxy and remove encoding ****
+                const proxiedFeedUrl = PROXY_URL + publicFeedUrl;
 
                 try {
                     const response = await fetch(proxiedFeedUrl);
@@ -876,7 +879,7 @@
                     li.appendChild(feedButton); // Add the feed button
                     li.appendChild(favButton); // Add the favorite button
                     li.appendChild(description);
-                    li.appendChild(stats);
+li.appendChild(stats);
                     
                     serverList.appendChild(li);
                 });
