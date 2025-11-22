@@ -7,7 +7,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Hide scrollbar for clean UI */
-/* ... existing code ... -->
+        ::-webkit-scrollbar {
+            width: 0;
+            background: transparent;
+        }
         .view {
             display: none; /* All views hidden by default */
         }
@@ -151,6 +154,10 @@
 
     <!-- Firebase SDK -->
     <script type="module">
+        // --- LOOK HERE! ---
+        // Step 5 from instructions.md is just below this line.
+        // ---
+
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { 
             getAuth, 
@@ -185,9 +192,24 @@
         let postsListener = null;
         let commentsListener = null;
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-agora-app';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // --- This is your Firebase Config Object ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDlEr2MBDVoeErJhZCpSD8S3QT_StTJ0T0",
+            authDomain: "my-agora-site.firebaseapp.com",
+            projectId: "my-agora-site",
+            storageBucket: "my-agora-site.firebasestorage.app",
+            messagingSenderId: "340406321594",
+            appId: "1:340406321594:web:8194c3df77c1d496669d83",
+            measurementId: "G-E3VE85GQVL"
+        };
+        // --- END OF CONFIG ---
+
+        // We use 'default-agora-app' as a public path.
+        // You can leave this as-is.
+        const appId = 'default-agora-app';
+        
+        // This is no longer needed when using your own project
+        const initialAuthToken = null;
 
         // --- Firestore Collection References ---
         const USERS_COLLECTION = `artifacts/${appId}/public/data/agora-users`;
@@ -427,7 +449,7 @@
         /**
          * Listens for real-time updates to comments on a specific post.
          * @param {string} postId - The ID of the post to fetch comments for.
-         */
+         !*/
         function listenToComments(postId) {
             const commentsListEl = document.getElementById('comments-list');
             commentsListEl.innerHTML = `<div class="text-center text-gray-500 py-10">Loading comments...</div>`;
@@ -635,8 +657,8 @@
         async function initApp() {
             showView('loading');
             
-            if (!firebaseConfig.apiKey) {
-                showError("Firebase configuration is missing. The app cannot start.");
+            if (!firebaseConfig.apiKey || firebaseConfig.apiKey.includes("YOUR_API_KEY")) {
+                showError("Firebase configuration is missing or is still the placeholder. Please follow the instructions to set up your own Firebase project and paste the config object into agora.html.");
                 return;
             }
 
@@ -690,11 +712,8 @@
                 } else {
                     // No user, sign them in
                     try {
-                        if (initialAuthToken) {
-                            await signInWithCustomToken(auth, initialAuthToken);
-                        } else {
-                            await signInAnonymously(auth);
-                        }
+                        // We will always sign in anonymously for this public app
+                        await signInAnonymously(auth);
                         // onAuthStateChanged will fire again with the new user
                     } catch (error) {
                         showError("Authentication failed: " + error.message);
