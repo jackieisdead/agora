@@ -1,547 +1,156 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-blue-800">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agora :: Your Open Social Space</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&family=VT323&display=swap" rel="stylesheet">
-
+    <title>Agora - Browser Social Network</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* CSS is mostly the same, with new styles for the Modal */
-        body {
-            background: #f0f0f0 url(https://www.transparenttextures.com/patterns/stardust.png);
-            font-family: 'VT323', monospace;
-            font-size: 18px;
-            line-height: 1.6;
-            color: #333;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 20px auto;
-            background: #ffffff;
-            border: 2px solid #000;
-            box-shadow: 6px 6px 0px #999;
-            padding: 10px;
-        }
-
-        .header {
-            text-align: center;
-            padding: 20px;
-            border-bottom: 4px double #000;
-        }
-
-        .header h1 {
-            font-family: 'Pixelify Sans', sans-serif;
-            font-size: 4.5em;
-            margin: 0;
-            color: #000;
-            text-shadow: 3px 3px #ccc;
-        }
-
-        .header p {
-            font-size: 1.2em;
-            margin: 0;
-            font-weight: bold;
-        }
-
-        .navbar {
-            text-align: center;
-            padding: 10px 0;
-            border-bottom: 2px solid #eee;
-        }
-
-        .navbar a {
-            font-family: 'Pixelify Sans', sans-serif;
-            font-size: 1.3em;
-            text-decoration: none;
-            color: #0000ee;
-            margin: 0 15px;
-            padding: 2px 5px;
-            transition: all 0.2s;
-        }
-
-        .navbar a:hover {
-            background: #ffff99;
-            text-decoration: underline;
-        }
-
-        .main-layout {
-            display: flex;
-            flex-wrap: wrap;
-            padding-top: 20px;
-        }
-
-        .content {
-            flex: 3;
-            padding-right: 20px;
-            min-width: 300px;
-        }
-
-        .sidebar {
-            flex: 1;
-            padding-left: 20px;
-            border-left: 2px dashed #ccc;
-            min-width: 200px;
-        }
-
-        h2 {
-            font-family: 'Pixelify Sans', sans-serif;
-            font-size: 2.5em;
-            color: #000;
-            border-bottom: 2px solid #000;
-            padding-bottom: 5px;
+        /* Hide scrollbar for clean UI */
+/* ... existing code ... -->
+        .view {
+            display: none; /* All views hidden by default */
         }
         
-        h3 {
-            font-family: 'Pixelify Sans', sans-serif;
-            font-size: 1.8em;
-            color: #333;
-        }
-
-        .button {
-            display: inline-block;
-            background: #ddd;
-            border: 2px outset #aaa;
-            padding: 8px 15px;
-            text-decoration: none;
-            color: #000;
-            font-family: 'Pixelify Sans', sans-serif;
-            font-size: 1.2em;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        .button:hover {
-            background: #ccc;
-        }
-
-        .button:active {
-            border-style: inset;
-            background: #bbb;
+        /* Classic 3D Button Style */
+        .btn-3d {
+            @apply border-2 border-t-gray-100 border-l-gray-100 border-b-black border-r-black active:border-t-black active:border-l-black active:border-b-gray-100 active:border-r-gray-100;
         }
         
-        /* Smaller button for the feed */
-        .button-small {
-            background: #eee;
-            border: 2px outset #ccc;
-            padding: 2px 8px;
-            text-decoration: none;
-            color: #333;
-            font-family: 'VT323', monospace;
-            font-size: 1em;
-            cursor: pointer;
-            margin-left: 8px;
-        }
-        .button-small:hover {
-            background: #ddd;
-        }
-        .button-small:active {
-            border-style: inset;
+        /* Classic 3D Inset Container Style */
+        .container-3d {
+             @apply bg-gray-300 shadow-md border-2 border-t-gray-100 border-l-gray-100 border-b-gray-500 border-r-gray-500;
         }
 
-        /* NEW: Button for favoriting */
-        .button-fav {
-            background: #fff;
-            border: 2px outset #ccc;
-            color: #daa520; /* Goldenrod color for star */
-            font-size: 1.1em;
-            padding: 2px 6px;
-            margin-left: 4px;
-        }
-        .button-fav:hover {
-            background: #f0f0f0;
-        }
-        .button-fav:disabled {
-            color: #999;
-            background: #f9f9f9;
-            cursor: not-allowed;
-        }
-        
-        /* NEW: Button for removing favorite */
-        .button-remove-fav {
-            background: #fee;
-            border: 2px outset #ccc;
-            color: #d00;
-            font-family: 'VT323', monospace;
-            font-size: 0.9em;
-            cursor: pointer;
-            margin-left: 8px;
-        }
-        .button-remove-fav:hover {
-            background: #fdd;
-        }
-
-
-        .feature-box {
-            background: #f9f9f9;
-            border: 1px solid #ccc;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-
-        .sidebar-box {
-            border: 2px solid #eee;
-            background: #fafafa;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .sidebar-box h3 {
-            margin-top: 0;
-            border-bottom: 1px solid #ccc;
-        }
-        
-        .sidebar-box p {
-            font-size: 0.9em;
-            margin: 0 0 10px 0;
-        }
-
-        /* NEW: Auth status box */
-        #auth-status {
-            background: #ffc;
-            border: 2px dashed #cc9;
-            font-size: 1em;
-            padding: 10px;
-            word-break: break-all;
-        }
-        #auth-status p {
-            margin: 0;
-            font-weight: bold;
-        }
-
-        .sidebar-gif {
-            width: 100%;
-            height: auto;
-            image-rendering: pixelated;
-        }
-
-        #server-search {
-            width: 100%;
-            box-sizing: border-box;
-            font-family: 'VT323', monospace;
-            font-size: 16px;
-            padding: 5px;
-            border: 2px inset #aaa;
-            background: #fff;
-            margin-bottom: 10px;
-        }
-        
-        .server-list-container {
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid #ccc;
-            background: #fff;
-            padding: 5px;
-        }
-
-        #server-list, #favorite-server-list {
-            list-style-type: none;
-            padding-left: 0;
-            margin: 0;
-        }
-        
-        .server-list-item {
-            border-bottom: 1px dashed #eee;
-            padding: 8px 5px;
-        }
-        
-        .server-list-item:last-child {
-            border-bottom: none;
-        }
-
-        .server-list-item a {
-            font-family: 'Pixelify Sans', sans-serif;
-            font-size: 1.2em;
-            color: #0000ee;
-            text-decoration: none;
-            font-weight: bold;
-            word-break: break-all;
-        }
-        
-        .server-list-item a:hover {
-            text-decoration: underline;
-        }
-
-        .server-list-item p {
-            font-size: 1em;
-            color: #333;
-            margin: 3px 0 0 0;
-            line-height: 1.3;
-        }
-        
-        .server-list-item span {
-            font-size: 0.9em;
-            color: #008000;
-            font-weight: bold;
-            display: block;
-            margin-top: 4px;
-        }
-
-        /* NEW: Favorite list styles */
-        #favorite-server-list .server-list-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
-        #favorite-server-list .server-info {
-            flex-grow: 1;
-        }
-
-
-        .footer {
-            text-align: center;
-            border-top: 4px double #000;
-            padding: 20px;
-            margin-top: 20px;
-            font-size: 1.1em;
-        }
-
-        /* --- NEW MODAL STYLES --- */
-        .modal {
-            display: none; /* Hidden by default */
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.6); /* Black overlay */
-        }
-
-        .modal-content {
-            position: relative;
-            background: #fff;
-            border: 2px solid #000;
-            box-shadow: 6px 6px 0px #999;
-            margin: 10% auto;
-            padding: 20px;
-            max-width: 600px;
-            width: 90%;
-            font-size: 16px; /* Use smaller font for modal */
-        }
-        
-        .modal-header {
-            border-bottom: 2px dashed #ccc;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .modal-header h3 {
-            margin: 0;
-            font-size: 1.5em;
-            word-break: break-all;
-        }
-
-        .modal-close {
-            font-family: 'Pixelify Sans', sans-serif;
-            font-size: 2em;
-            font-weight: bold;
-            color: #aaa;
-            cursor: pointer;
-            padding: 0 10px;
-        }
-
-        .modal-close:hover {
-            color: #000;
-        }
-        
-        .modal-body {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        
-        .post {
-            border: 1px solid #eee;
-            background: #fcfcfc;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-        
-        .post-author {
-            font-weight: bold;
-            font-family: 'Pixelify Sans', sans-serif;
-            font-size: 1.2em;
-            color: #000;
-            margin-bottom: 5px;
-        }
-        
-        .post-content {
-            font-size: 1em;
-            line-height: 1.5;
-            word-wrap: break-word; /* Handle long strings */
-        }
-        /* Style paragraphs inside the post content */
-        .post-content p {
-            margin: 0 0 10px 0;
-        }
-        .post-content p:last-child {
-            margin-bottom: 0;
+        /* Classic 3D Sunken Input Style */
+        .input-3d {
+            @apply border-2 border-gray-700 bg-white focus:outline-none focus:border-black;
         }
 
     </style>
 </head>
-<body>
+<body class="h-full font-serif">
+    <div id="app-root" class="flex flex-col h-screen">
 
-    <div class="container">
+        <!-- ===== Loading View ===== -->
+        <div id="loading-view" class="view flex items-center justify-center h-full">
+            <div class="text-center">
+                <svg class="animate-spin h-12 w-12 text-blue-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <h2 class="mt-4 text-xl font-semibold text-gray-700">Connecting to Agora...</h2>
+            </div>
+        </div>
 
-        <header class="header">
-            <h1>AGORA</h1>
-            <p>The Open Public Square</p>
-        </header>
+        <!-- ===== Setup View (for new users) ===== -->
+        <div id="setup-view" class="view flex items-center justify-center h-full p-4">
+            <div class="bg-gray-300 p-8 shadow-xl w-full max-w-md text-center border-2 border-t-gray-100 border-l-gray-100 border-b-gray-500 border-r-gray-500">
+                <h1 class="text-3xl font-bold text-blue-900 mb-4">Welcome to Agora</h1>
+                <p class="text-gray-700 mb-6">Please set your public display name to join the conversation.</p>
+                <form id="setup-form">
+                    <input type="text" id="display-name-input" placeholder="Enter your display name" class="w-full px-4 py-3 border-2 border-gray-700 bg-white focus:outline-none focus:border-black" required>
+                    <button type="submit" class="w-full bg-gray-300 text-black py-3 px-4 font-semibold mt-4 border-2 border-t-gray-100 border-l-gray-100 border-b-black border-r-black active:border-t-black active:border-l-black active:border-b-gray-100 active:border-r-gray-100">Save & Enter Agora</button>
+                </form>
+            </div>
+        </div>
 
-        <nav class="navbar">
-            <a href="#about">About</a>
-            <a href="#features">Features</a>
-            <a href="#servers">Get Started</a>
-            <a href="https://instances.social/" target="_blank">Source Code</a>
-        </nav>
+        <!-- ===== Main App Container (hidden until setup is complete) ===== -->
+        <div id="app-container" class="view flex flex-col h-screen">
+            <!-- Header -->
+            <header id="user-info-header" class="bg-gray-300 shadow-md p-4 flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0 border-b-2 border-gray-500">
+                <h1 class="text-3xl font-bold text-blue-900">
+                    <marquee behavior="scroll" direction="left" scrollamount="5">~*~ Agora ~*~</marquee>
+                </h1>
+                <div class="text-right">
+                    <div id="user-display-name" class="font-semibold text-black"></div>
+                    <div id="user-id" class="text-xs text-gray-700 break-all"></div>
+                </div>
+            </header>
 
-        <div class="main-layout">
-
-            <!-- Left Column: Content -->
-            <main class="content">
-                <section id="about">
-                    <h2>Welcome to the conversation.</h2>
-                    <p>
-                        Tired of giant websites tracking you and controlling your feed?
-                        Agora is different. It's not one single site, but a network of thousands
-                        of independent communities that can all talk to each other.
-                    </p>
-                    <p>
-                        This page is a real portal. The list on the right is a
-                        <strong>live feed</strong> of actual <strong>Fediverse</strong> servers you can join.
-                        Click "View Feed" to see what's happening on a server right now, or
-                        <strong>'☆' to save it to your favorites!</strong>
-                    </p>
-                    <a href="#servers" class="button">Browse Servers &rarr;</a>
-                </section>
-
-                <section id="features">
-                    <h2>How It Works</h2>
-
-                    <div class="feature-box">
-                        <h3>[ 1 ] Choose Your Community</h3>
-                        <p>
-                            Use the list on the right to find a server.
-                            Click "View Feed" to sample the public conversation, or '☆'
-                            to add it to your "My Favorites" list.
-                        </p>
-                    </div>
-
-                    <div class="feature-box">
-                        <h3>[ 2 ] Create Your Profile</h3>
-                        <p>
-                            Like what you see? Click the server's name to visit their
-                            homepage and sign up (for free!).
-                        </p>
-                    </div>
-
-                    <div class="feature-box">
-                        <h3>[ 3 ] Connect with Anyone</h3>
-                        <p>
-                            From your new account, you can follow friends and interesting
-                            people from *any* other Fediverse server.
-                        </p>
-                    </div>
-                </section>
-
-            </main>
-
-            <!-- Right Column: Sidebar -->
-            <aside class="sidebar">
+            <!-- App Content Area -->
+            <main class="flex-1 overflow-y-auto p-4 sm:p-6 bg-gray-200">
                 
-                <img src="https://web.archive.org/web/20090830084344if_/http://geocities.com/athens/olympus/1350/globe.gif" 
-                     alt="Spinning pixel globe" 
-                     class="sidebar-gif"
-                     onerror="this.style.display='none'">
-
-                <!-- NEW: Auth Status -->
-                <div class="sidebar-box" id="auth-status">
-                    <p>Connecting...</p>
-                </div>
-
-                <!-- NEW: Favorite Servers Box -->
-                <div class="sidebar-box" id="favorite-servers-box">
-                    <h3>My Favorite Servers</h3>
-                    <div class="server-list-container">
-                        <ul id="favorite-server-list">
-                            <li>Loading favorites...</li>
-                        </ul>
+                <!-- ===== Rooms View (Homepage) ===== -->
+                <div id="rooms-view" class="view max-w-4xl mx-auto">
+                    <div class="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
+                        <h2 class="text-2xl font-semibold text-black">Rooms</h2>
+                        <form id="create-room-form" class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                            <input type="text" id="room-name-input" placeholder="New room name" class="px-3 py-2 border-2 border-gray-700 bg-white focus:outline-none focus:border-black flex-1" required>
+                            <button type="submit" class="bg-gray-300 text-black py-2 px-4 font-semibold border-2 border-t-gray-100 border-l-gray-100 border-b-black border-r-black active:border-t-black active:border-l-black active:border-b-gray-100 active:border-r-gray-100">Create Room</button>
+                        </form>
+                    </div>
+                    <div id="rooms-list" class="space-y-3">
+                        <!-- Rooms will be injected here -->
                     </div>
                 </div>
 
-
-                <!-- FUNCTIONAL SERVER BROWSER -->
-                <div class="sidebar-box" id="servers">
-                    <!-- UPDATED TEXT -->
-                    <h3>Find a Fediverse Server</h3>
-                    <p>Live list of (English-speaking) servers.
-                       Search by name or description.
-                    </V>
-                    <input type="text" id="server-search" placeholder="Filter Fediverse servers...">
+                <!-- ===== Posts View (Inside a Room) ===== -->
+                <div id="posts-view" class="view max-w-4xl mx-auto">
+                    <div class="mb-6">
+                        <button id="back-to-rooms" class="text-blue-700 hover:underline mb-2">&larr; Back to all rooms</button>
+                        <h2 id="posts-room-name" class="text-3xl font-bold text-black"></h2>
+                    </div>
                     
-                    <div class="server-list-container">
-                        <ul id="server-list">
-                            <li>Loading servers...</li>
-                        </ul>
+                    <!-- Create Post Form -->
+                    <div class="bg-gray-300 p-4 shadow-md mb-6 border-2 border-t-gray-100 border-l-gray-100 border-b-gray-500 border-r-gray-500">
+                        <form id="create-post-form">
+                            <h3 class="text-xl font-semibold mb-3">Create a new post</h3>
+                            <input type="text" id="post-title-input" placeholder="Post title" class="w-full px-3 py-2 border-2 border-gray-700 bg-white focus:outline-none focus:border-black mb-2" required>
+                            <textarea id="post-content-input" placeholder="What's on your mind? (optional)" rows="3" class="w-full px-3 py-2 border-2 border-gray-700 bg-white focus:outline-none focus:border-black mb-2"></textarea>
+                            <button type="submit" class="bg-gray-300 text-black py-2 px-4 font-semibold border-2 border-t-gray-100 border-l-gray-100 border-b-black border-r-black active:border-t-black active:border-l-black active:border-b-gray-100 active:border-r-gray-100">Submit Post</button>
+                        </form>
+                    </div>
+
+                    <!-- Posts List -->
+                    <div id="posts-list" class="space-y-4">
+                        <!-- Posts will be injected here -->
                     </div>
                 </div>
-                <!-- END FUNCTIONAL SERVER BROWSER -->
 
-                <div class="sidebar-box">
-                    <h3>Badges</h3>
-                    <img src="https://web.archive.org/web/20091027173153if_/http://geocities.com/clipart/pbi/buttons/Mozilla/mozilla_1.gif" alt="Powered by Mozilla" style="margin: 2px;" onerror="this.style.display='none'">
-                    <img src="https://web.archive.org/web/20091027173153if_/http://geocities.com/clipart/pbi/buttons/Computer/webnow.gif" alt="Viewable on any browser" style="margin: 2px;" onerror="this.style.display='none'">
-                    <img src="https://web.archive.org/web/20091026194354if_/http://www.geocities.com/Area51/Rampart/2627/anarchy.gif" alt="Anarchy" style="margin: 2px;" onerror="this.style.display='none'">
+                <!-- ===== Comments View (Inside a Post) ===== -->
+                <div id="comments-view" class="view max-w-4xl mx-auto">
+                    <div class="mb-6">
+                        <button id="back-to-posts" class="text-blue-700 hover:underline mb-2">&larr; Back to room</button>
+                    </div>
+                    
+                    <!-- Original Post -->
+                    <div id="post-detail" class="bg-gray-300 p-5 shadow-md mb-6 border-2 border-t-gray-100 border-l-gray-100 border-b-gray-500 border-r-gray-500">
+                        <!-- Post content injected here -->
+                    </div>
+
+                    <!-- Add Comment Form -->
+                    <div class="bg-gray-300 p-4 shadow-md mb-6 border-2 border-t-gray-100 border-l-gray-100 border-b-gray-500 border-r-gray-500">
+                        <form id="add-comment-form">
+                            <h3 class="text-xl font-semibold mb-3">Add a comment</h3>
+                            <textarea id="comment-content-input" placeholder="Join the discussion..." rows="3" class="w-full px-3 py-2 border-2 border-gray-700 bg-white focus:outline-none focus:border-black mb-2" required></textarea>
+                            <button type="submit" class="bg-gray-300 text-black py-2 px-4 font-semibold border-2 border-t-gray-100 border-l-gray-100 border-b-black border-r-black active:border-t-black active:border-l-black active:border-b-gray-100 active:border-r-gray-100">Post Comment</button>
+                        </form>
+                    </div>
+
+                    <!-- Comments List -->
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-4">Comments</h3>
+                    <div id="comments-list" class="space-y-4">
+                        <!-- Comments will be injected here -->
+                    </div>
                 </div>
-
-            </aside>
-
+            </main>
         </div>
 
-        <footer class="footer">
-            <p>Built by the community.</p>
-            <p>This is a functional portal to the Fediverse. Server list
-                powered by the <a href="https://instances.social/api/1.0/" target="_blank">instances.social API</a>
-                via <a href="https://allorigins.win/" target="_blank">allorigins.win</a>.
-            </p>
-        </footer>
-
     </div>
-    
-    <!-- NEW: The Modal (Popup) HTML (Unchanged) -->
-    <div id="feed-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modal-title">Loading feed...</h3>
-                <span id="modal-close" class="modal-close">&times;</span>
-            </div>
-            <div id="modal-body" class="modal-body">
-                <p>Fetching public posts...</p>
-            </div>
+
+    <!-- Error Modal -->
+    <div id="error-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center p-4 z-50">
+        <div class="bg-gray-300 p-8 shadow-xl w-full max-w-md text-center border-4 border-double border-red-800">
+            <h2 class="text-2xl font-bold text-red-800 mb-4">Error</h2>
+            <p id="error-message" class="text-gray-800 mb-6"></p>
+            <button id="close-error-modal" class="bg-gray-300 text-black py-2 px-6 font-semibold border-2 border-t-gray-100 border-l-gray-100 border-b-black border-r-black active:border-t-black active:border-l-black active:border-b-gray-100 active:border-r-gray-1s00">Close</button>
         </div>
     </div>
 
 
-    <!-- NEW: Import Firebase services -->
+    <!-- Firebase SDK -->
     <script type="module">
-        // These global variables are provided by the environment
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "DEFAULT_API_KEY", authDomain: "DEFAULT_AUTH_DOMAIN", projectId: "DEFAULT_PROJECT_ID" };
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        // Import functions from the Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { 
             getAuth, 
@@ -552,390 +161,552 @@
         import { 
             getFirestore, 
             doc, 
+            getDoc, 
             setDoc, 
-            updateDoc, 
-            arrayUnion, 
-            arrayRemove,
-            onSnapshot,
+            addDoc, 
+            collection, 
+            query, 
+            where, 
+            onSnapshot, 
+            serverTimestamp,
             setLogLevel
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        // --- Global State ---
+        let db, auth;
+        let currentUserId = null;
+        let currentUserDisplayName = null;
         
-        // Enable debug logging for Firestore
-        setLogLevel('Debug');
+        let currentRoomId = null;
+        let currentRoomName = null;
+        let currentPost = null;
 
-        // --- Main App Logic ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const serverList = document.getElementById('server-list');
-            const serverSearch = document.getElementById('server-search');
-            const favoriteServerList = document.getElementById('favorite-server-list');
-            const authStatus = document.getElementById('auth-status');
-            
-            // Modal elements
-            const modal = document.getElementById('feed-modal');
-            const modalTitle = document.getElementById('modal-title');
-            const modalBody = document.getElementById('modal-body');
-            const modalClose = document.getElementById('modal-close');
-            
-            const API_URL = 'https://instances.social/api/1.0/instances/list?count=100&min_users=20&sort_by=users&sort_order=desc&include_down=false&include_closed=false&language=en';
-            
-            // **** FIX: Swapped to a different CORS proxy ****
-            const PROXY_URL = 'https://api.codetabs.com/v1/proxy?quest=';
-            // **** FIX: This proxy does not require URL encoding ****
-            const FETCH_URL = PROXY_URL + API_URL;
-            
-            let allServers = []; // Cached list of all servers from API
-            let currentFavorites = []; // Cached list of user's favorites
-            let userId = null;
-            let userDocRef = null;
-            let unsubscribeFavorites = () => {}; // Function to detach listener
+        let roomsListener = null;
+        let postsListener = null;
+        let commentsListener = null;
 
-            // --- Authentication ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-agora-app';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // --- Firestore Collection References ---
+        const USERS_COLLECTION = `artifacts/${appId}/public/data/agora-users`;
+        const ROOMS_COLLECTION = `artifacts/${appId}/public/data/agora-rooms`;
+        const POSTS_COLLECTION = `artifacts/${appId}/public/data/agora-posts`;
+        const COMMENTS_COLLECTION = `artifacts/${appId}/public/data/agora-comments`;
+
+        // --- UI Element References ---
+        const views = {
+            loading: document.getElementById('loading-view'),
+            setup: document.getElementById('setup-view'),
+            app: document.getElementById('app-container'),
+            rooms: document.getElementById('rooms-view'),
+            posts: document.getElementById('posts-view'),
+            comments: document.getElementById('comments-view')
+        };
+        const errorModal = document.getElementById('error-modal');
+        const errorMessage = document.getElementById('error-message');
+
+        // --- Utility Functions ---
+
+        /**
+         * Shows a specific view and hides all others.
+         * @param {string} viewName - The key of the view to show (e.g., 'loading', 'setup', 'rooms')
+         */
+        function showView(viewName) {
+            Object.keys(views).forEach(key => {
+                if (key === viewName || (viewName !== 'loading' && viewName !== 'setup' && key === 'app')) {
+                    // Show the main app container for 'rooms', 'posts', 'comments'
+                    if (key === 'app') {
+                        views[key].style.display = 'flex';
+                    } else if (Object.keys(views).includes(viewName)) {
+                         views[viewName].style.display = 'block';
+                    }
+                } else {
+                    views[key].style.display = 'none';
+                }
+            });
+            // Also hide all sub-views within the app container if we're not showing one of them
+            if (viewName === 'loading' || viewName === 'setup') {
+                views.rooms.style.display = 'none';
+                views.posts.style.display = 'none';
+                views.comments.style.display = 'none';
+            }
+        }
+
+        /**
+         * Displays the error modal with a specific message.
+         * @param {string} message - The error message to display.
+         */
+        function showError(message) {
+            console.error(message);
+            errorMessage.textContent = message;
+            errorModal.style.display = 'flex';
+        }
+
+        /**
+         * Closes the error modal.
+         */
+        function closeErrorModal() {
+            errorModal.style.display = 'none';
+        }
+
+        /**
+         * Formats Firestore timestamps into a readable string.
+         * @param {object} timestamp - Firestore timestamp object.
+         * @returns {string} - Formatted date/time string.
+         */
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return 'Just now';
+            return timestamp.toDate().toLocaleString(undefined, {
+                dateStyle: 'medium',
+                timeStyle: 'short'
+            });
+        }
+
+        /**
+         * Detaches all active Firestore listeners.
+         */
+        function detachListeners() {
+            if (roomsListener) roomsListener();
+            if (postsListener) postsListener();
+            if (commentsListener) commentsListener();
+            roomsListener = postsListener = commentsListener = null;
+        }
+
+        // --- Navigation Functions ---
+
+        /**
+         * Navigates to the main Rooms view.
+         */
+        function navigateToRooms() {
+            detachListeners();
+            currentRoomId = null;
+            currentRoomName = null;
+            currentPost = null;
+            listenToRooms();
+            showView('rooms');
+            window.scrollTo(0, 0);
+        }
+
+        /**
+         * Navigates to the Posts view for a specific room.
+         * @param {string} roomId - The document ID of the room.
+         * @param {string} roomName - The name of the room.
+         */
+        function navigateToPosts(roomId, roomName) {
+            detachListeners();
+            currentRoomId = roomId;
+            currentRoomName = roomName;
+            currentPost = null;
+            
+            document.getElementById('posts-room-name').textContent = roomName;
+            listenToPosts(roomId);
+            showView('posts');
+            window.scrollTo(0, 0);
+        }
+
+        /**
+         * Navigates to the Comments view for a specific post.
+         * @param {object} post - The post object.
+         */
+        function navigateToComments(post) {
+            detachListeners();
+            currentPost = post;
+            
+            // Render the post detail
+            const postDetailEl = document.getElementById('post-detail');
+            postDetailEl.innerHTML = `
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">${post.title}</h2>
+                <p class="text-gray-700 whitespace-pre-wrap mb-3">${post.content}</p>
+                <div class="text-sm text-gray-500">
+                    Posted by <strong>${post.authorName || 'Anonymous'}</strong>
+                </div>
+                <div class="text-sm text-gray-500">${formatTimestamp(post.createdAt)}</div>
+            `;
+            
+            document.getElementById('back-to-posts').onclick = () => navigateToPosts(currentRoomId, currentRoomName);
+            
+            listenToComments(post.id);
+            showView('comments');
+            window.scrollTo(0, 0);
+        }
+
+        // --- Firestore Listeners & Renderers ---
+
+        /**
+         * Listens for real-time updates to the rooms collection and renders them.
+         */
+        function listenToRooms() {
+            const roomsListEl = document.getElementById('rooms-list');
+            try {
+                const q = query(collection(db, ROOMS_COLLECTION));
+                roomsListener = onSnapshot(q, (snapshot) => {
+                    if (snapshot.empty) {
+                        roomsListEl.innerHTML = `<div class="text-center text-gray-500 py-10">No rooms yet. Be the first to create one!</div>`;
+                        return;
+                    }
+                    
+                    const rooms = [];
+                    snapshot.forEach(doc => {
+                        rooms.push({ id: doc.id, ...doc.data() });
+                    });
+
+                    // Sort rooms by name (A-Z)
+                    rooms.sort((a, b) => a.name.localeCompare(b.name));
+
+                    roomsListEl.innerHTML = rooms.map(room => `
+                        <div class="bg-gray-300 p-4 shadow-md border-2 border-t-gray-100 border-l-gray-100 border-b-gray-500 border-r-gray-500">
+                            <a href="#" class="block room-link" data-room-id="${room.id}" data-room-name="${room.name}">
+                                <h3 class="text-xl font-semibold text-blue-800 hover:underline">${room.name}</h3>
+                                <p class="text-sm text-gray-700">
+                                    Created by <strong>${room.authorName || 'Anonymous'}</strong> on ${formatTimestamp(room.createdAt)}
+                                </p>
+                            </a>
+                        </div>
+                    `).join('');
+
+                }, (error) => {
+                    showError("Failed to load rooms: " + error.message);
+                    console.error("Error listening to rooms: ", error);
+                });
+            } catch (error) {
+                showError("Error setting up rooms listener: " + error.message);
+            }
+        }
+
+        /**
+         * Listens for real-time updates to posts in a specific room.
+         * @param {string} roomId - The ID of the room to fetch posts for.
+         */
+        function listenToPosts(roomId) {
+            const postsListEl = document.getElementById('posts-list');
+            postsListEl.innerHTML = `<div class="text-center text-gray-500 py-10">Loading posts...</div>`;
+            try {
+                const q = query(collection(db, POSTS_COLLECTION), where("roomId", "==", roomId));
+                postsListener = onSnapshot(q, (snapshot) => {
+                    if (snapshot.empty) {
+                        postsListEl.innerHTML = `<div class="text-center text-gray-500 py-10">No posts in this room yet. Be the first!</div>`;
+                        return;
+                    }
+
+                    const posts = [];
+                    snapshot.forEach(doc => {
+                        posts.push({ id: doc.id, ...doc.data() });
+                    });
+                    
+                    // Sort posts by creation date (newest first)
+                    posts.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+                    postsListEl.innerHTML = posts.map(post => `
+                        <div class="bg-gray-300 p-4 shadow-md border-2 border-t-gray-100 border-l-gray-100 border-b-gray-500 border-r-gray-500">
+                            <a href="#" class="block post-link" data-post-id="${post.id}">
+                                <h3 class="text-xl font-semibold text-blue-800 hover:underline">${post.title}</h3>
+                                <p class="text-sm text-gray-700 truncate">${post.content || 'No content'}</p>
+                                <div class="text-xs text-gray-500 mt-2">
+                                    Posted by <strong>${post.authorName || 'Anonymous'}</strong> &bull; ${formatTimestamp(post.createdAt)}
+                                </div>
+                            </a>
+                        </div>
+                    `).join('');
+                    
+                    // Store posts data on the element for the click handler
+                    postsListEl.querySelectorAll('.post-link').forEach((el, index) => {
+                        el.dataset.postObject = JSON.stringify(posts[index]);
+                    });
+
+                }, (error) => {
+                    showError("Failed to load posts: " + error.message);
+                    console.error("Error listening to posts: ", error);
+                });
+            } catch (error) {
+                showError("Error setting up posts listener: " + error.message);
+            }
+        }
+        
+        /**
+         * Listens for real-time updates to comments on a specific post.
+         * @param {string} postId - The ID of the post to fetch comments for.
+         */
+        function listenToComments(postId) {
+            const commentsListEl = document.getElementById('comments-list');
+            commentsListEl.innerHTML = `<div class="text-center text-gray-500 py-10">Loading comments...</div>`;
+            try {
+                const q = query(collection(db, COMMENTS_COLLECTION), where("postId", "==", postId));
+                commentsListener = onSnapshot(q, (snapshot) => {
+                    if (snapshot.empty) {
+                        commentsListEl.innerHTML = `<div class="text-center text-gray-500 py-10">No comments yet.</div>`;
+                        return;
+                    }
+
+                    const comments = [];
+                    snapshot.forEach(doc => {
+                        comments.push({ id: doc.id, ...doc.data() });
+                    });
+
+                    // Sort comments by creation date (oldest first)
+                    comments.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
+
+                    commentsListEl.innerHTML = comments.map(comment => `
+                        <div class="bg-gray-300 p-4 shadow border-2 border-b-gray-500 border-r-gray-500 border-t-gray-100 border-l-gray-100">
+                            <p class="text-gray-800 whitespace-pre-wrap">${comment.content}</p>
+                            <div class="text-xs text-gray-600 mt-3 pt-2 border-t border-gray-400">
+                                <strong>${comment.authorName || 'Anonymous'}</strong> &bull; ${formatTimestamp(comment.createdAt)}
+                            </div>
+                        </div>
+                    `).join('');
+
+                }, (error) => {
+                    showError("Failed to load comments: " + error.message);
+                    console.error("Error listening to comments: ", error);
+                });
+            } catch (error) {
+                showError("Error setting up comments listener: " + error.message);
+            }
+        }
+
+
+        // --- Event Handlers ---
+
+        /**
+         * Handles the new user setup form submission.
+         */
+        async function handleSetupSubmit(e) {
+            e.preventDefault();
+            const displayNameInput = document.getElementById('display-name-input');
+            const displayName = displayNameInput.value.trim();
+            
+            if (!displayName) {
+                showError("Display name cannot be empty.");
+                return;
+            }
+
+            try {
+                const userDocRef = doc(db, USERS_COLLECTION, currentUserId);
+                await setDoc(userDocRef, {
+                    displayName: displayName,
+                    userId: currentUserId,
+                    createdAt: serverTimestamp()
+                });
+                
+                currentUserDisplayName = displayName;
+                document.getElementById('user-display-name').textContent = currentUserDisplayName;
+                document.getElementById('user-id').textContent = `ID: ${currentUserId}`;
+                
+                navigateToRooms();
+                
+            } catch (error) {
+                showError("Failed to save display name: " + error.message);
+                console.error("Error setting display name: ", error);
+            }
+        }
+
+        /**
+         * Handles the "Create Room" form submission.
+         */
+        async function handleCreateRoom(e) {
+            e.preventDefault();
+            const roomNameInput = document.getElementById('room-name-input');
+            const roomName = roomNameInput.value.trim();
+
+            if (!roomName) {
+                showError("Room name cannot be empty.");
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, ROOMS_COLLECTION), {
+                    name: roomName,
+                    createdBy: currentUserId,
+                    authorName: currentUserDisplayName,
+                    createdAt: serverTimestamp()
+                });
+                roomNameInput.value = ''; // Clear input
+            } catch (error) {
+                showError("Failed to create room: " + error.message);
+                console.error("Error creating room: ", error);
+            }
+        }
+
+        /**
+         * Handles the "Create Post" form submission.
+         */
+        async function handleCreatePost(e) {
+            e.preventDefault();
+            const titleInput = document.getElementById('post-title-input');
+            const contentInput = document.getElementById('post-content-input');
+            
+            const title = titleInput.value.trim();
+            const content = contentInput.value.trim();
+
+            if (!title) {
+                showError("Post title cannot be empty.");
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, POSTS_COLLECTION), {
+                    roomId: currentRoomId,
+                    title: title,
+                    content: content,
+                    createdBy: currentUserId,
+                    authorName: currentUserDisplayName,
+                    createdAt: serverTimestamp()
+                });
+                titleInput.value = '';
+                contentInput.value = '';
+            } catch (error) {
+                showError("Failed to create post: " + error.message);
+                console.error("Error creating post: ", error);
+            }
+        }
+
+        /**
+         * Handles the "Add Comment" form submission.
+         */
+        async function handleAddComment(e) {
+            e.preventDefault();
+            const contentInput = document.getElementById('comment-content-input');
+            const content = contentInput.value.trim();
+
+            if (!content) {
+                showError("Comment cannot be empty.");
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, COMMENTS_COLLECTION), {
+                    postId: currentPost.id,
+                    content: content,
+                    createdBy: currentUserId,
+                    authorName: currentUserDisplayName,
+                    createdAt: serverTimestamp()
+                });
+                contentInput.value = '';
+            } catch (error) {
+                showError("Failed to add comment: " + error.message);
+                console.error("Error adding comment: ", error);
+            }
+        }
+
+        /**
+         * Handles clicks on dynamic elements (rooms, posts).
+         */
+        function handleDynamicClicks(e) {
+            let target = e.target;
+            
+            // Navigate to Posts
+            const roomLink = target.closest('.room-link');
+            if (roomLink) {
+                e.preventDefault();
+                const roomId = roomLink.dataset.roomId;
+                const roomName = roomLink.dataset.roomName;
+                navigateToPosts(roomId, roomName);
+                return;
+            }
+
+            // Navigate to Comments
+            const postLink = target.closest('.post-link');
+            if (postLink) {
+                e.preventDefault();
+                try {
+                    const post = JSON.parse(postLink.dataset.postObject);
+                    // Re-parse the timestamp if it's a string
+                    if (post.createdAt && typeof post.createdAt === 'object') {
+                        post.createdAt = {
+                            ...post.createdAt,
+                            toDate: () => new Date(post.createdAt.seconds * 1000)
+                        };
+                    }
+                    navigateToComments(post);
+                } catch (err) {
+                    showError("Could not load post details.");
+                    console.error("Error parsing post object:", err);
+                }
+                return;
+            }
+        }
+
+        // --- App Initialization ---
+
+        /**
+         * Main initialization function.
+         */
+        async function initApp() {
+            showView('loading');
+            
+            if (!firebaseConfig.apiKey) {
+                showError("Firebase configuration is missing. The app cannot start.");
+                return;
+            }
+
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                setLogLevel('Debug'); // Enable Firestore logging
+
+                // Attach global event listeners
+                document.getElementById('setup-form').addEventListener('submit', handleSetupSubmit);
+                document.getElementById('create-room-form').addEventListener('submit', handleCreateRoom);
+                document.getElementById('create-post-form').addEventListener('submit', handleCreatePost);
+                document.getElementById('add-comment-form').addEventListener('submit', handleAddComment);
+                document.getElementById('close-error-modal').addEventListener('click', closeErrorModal);
+                document.getElementById('back-to-rooms').addEventListener('click', navigateToRooms);
+                
+                // Use event delegation for dynamic content
+                document.getElementById('app-root').addEventListener('click', handleDynamicClicks);
+
+                // Start auth process
+                handleAuth();
+
+            } catch (error) {
+                showError("Failed to initialize app: " + error.message);
+                console.error("Initialization error: ", error);
+            }
+        }
+
+        /**
+         * Handles user authentication and setup check.
+         */
+        function handleAuth() {
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
-                    console.log("User is signed in:", user.uid);
-                    userId = user.uid;
+                    currentUserId = user.uid;
                     
-                    // Creates a 6-segment path pointing to a document
-                    userDocRef = doc(db, `artifacts/${appId}/users/${userId}/fediversePortal/data`);
-                    
-                    authStatus.innerHTML = `<p>Your User ID:<br>${userId}</p>`;
-                    
-                    // Detach any old listener
-                    unsubscribeFavorites(); 
-                    
-                    // Set up listener for this user's favorites
-                    setupFavoritesListener();
-                    
-                    // Fetch servers (we only do this once auth is ready)
-                    await fetchServers();
+                    // Check if user has a profile
+                    const userDocRef = doc(db, USERS_COLLECTION, currentUserId);
+                    const userDoc = await getDoc(userDocRef);
 
+                    if (userDoc.exists()) {
+                        currentUserDisplayName = userDoc.data().displayName;
+                        document.getElementById('user-display-name').textContent = currentUserDisplayName;
+                        document.getElementById('user-id').textContent = `ID: ${currentUserId}`;
+                        navigateToRooms();
+                    } else {
+                        // New user, show setup view
+                        showView('setup');
+                    }
                 } else {
-                    console.log("User is signed out. Attempting to sign in...");
-                    authStatus.innerHTML = `<p>Connecting...</p>`;
-                    userId = null;
-                    userDocRef = null;
-                    unsubscribeFavorites(); // Detach listener
-                    
+                    // No user, sign them in
                     try {
                         if (initialAuthToken) {
                             await signInWithCustomToken(auth, initialAuthToken);
                         } else {
                             await signInAnonymously(auth);
                         }
+                        // onAuthStateChanged will fire again with the new user
                     } catch (error) {
-                        console.error("Error signing in:", error);
-                        authStatus.innerHTML = `<p><strong>Connection failed:</strong><br>${error.message}</p>`;
+                        showError("Authentication failed: " + error.message);
+                        console.error("Error during sign-in: ", error);
                     }
                 }
             });
+        }
 
-            // --- Firestore Favorites Listener ---
-            function setupFavoritesListener() {
-                if (!userDocRef) return;
+        // Start the app
+        document.addEventListener('DOMContentLoaded', initApp);
 
-                unsubscribeFavorites = onSnapshot(userDocRef, (docSnap) => {
-                    if (docSnap.exists()) {
-                        currentFavorites = docSnap.data().favorites || [];
-                        console.log("Favorites updated:", currentFavorites);
-                    } else {
-                        // No document yet, favorites list is empty
-                        currentFavorites = [];
-                        console.log("No favorites document found.");
-                    }
-                    renderFavorites(currentFavorites);
-                    // After favorites are loaded/updated, re-render the main server list
-                    // to update the "Favorite" button states
-                    renderServers(allServers);
-                }, (error) => {
-                    console.error("Error listening to favorites:", error);
-                    favoriteServerList.innerHTML = '<li>Error loading favorites.</li>';
-                });
-            }
-
-            // --- NEW: Render Favorites List ---
-            function renderFavorites(favorites) {
-                favoriteServerList.innerHTML = '';
-                if (favorites.length === 0) {
-                    favoriteServerList.innerHTML = '<li>No favorites yet. Click ☆ to add one!</li>';
-                    return;
-                }
-
-                favorites.forEach(server => {
-                    const li = document.createElement('li');
-                    li.className = 'server-list-item';
-
-                    const infoDiv = document.createElement('div');
-                    infoDiv.className = 'server-info';
-
-                    const link = document.createElement('a');
-                    link.href = `https://` + server.name;
-                    link.textContent = server.name;
-                    link.target = '_blank';
-
-                    const description = document.createElement('p');
-                    description.textContent = server.description;
-                    
-                    infoDiv.appendChild(link);
-                    infoDiv.appendChild(description);
-                    
-                    const removeButton = document.createElement('button');
-                    removeButton.className = 'button-remove-fav';
-                    removeButton.textContent = 'Remove';
-                    removeButton.onclick = () => removeFavorite(server); // Pass the exact object to remove
-
-                    li.appendChild(infoDiv);
-                    li.appendChild(removeButton);
-                    favoriteServerList.appendChild(li);
-                });
-            }
-
-            // --- NEW: Add/Remove Favorite Functions ---
-            async function addFavorite(serverName, serverDescription) {
-                if (!userDocRef) return;
-                const serverData = { name: serverName, description: serverDescription || "No description." };
-                try {
-                    await setDoc(userDocRef, { 
-                        favorites: arrayUnion(serverData) 
-                    }, { merge: true }); // Use set with merge to create doc if it doesn't exist
-                    console.log("Added favorite:", serverName);
-                } catch (error) {
-                    console.error("Error adding favorite:", error);
-                }
-            }
-
-            async function removeFavorite(serverObject) {
-                if (!userDocRef) return;
-                try {
-                    await updateDoc(userDocRef, {
-                        favorites: arrayRemove(serverObject)
-                    });
-                    console.log("Removed favorite:", serverObject.name);
-                } catch (error) {
-                    console.error("Error removing favorite:", error);
-                }
-            }
-
-
-            // --- Function to safely sanitize HTML content ---
-            function sanitizeHTML(html) {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                doc.querySelectorAll('script, style').forEach(el => el.remove());
-                doc.querySelectorAll('*').forEach(el => {
-                    for (let i = 0; i < el.attributes.length; i++) {
-                        const attrName = el.attributes[i].name;
-                        if (attrName.startsWith('on')) {
-                            el.removeAttribute(attrName);
-                        }
-                    }
-                });
-                return doc.body.innerHTML;
-            }
-
-            // --- Function to show the modal and fetch the public feed ---
-            async function showPublicFeed(domain) {
-                modal.style.display = 'block';
-                modalTitle.textContent = `Public Feed: ${domain}`;
-                modalBody.innerHTML = '<p>Fetching public posts...</p>';
-                
-                const publicFeedUrl = `https://${domain}/api/v1/timelines/public?limit=10`;
-                
-                // **** FIX: Use new proxy and remove encoding ****
-                const proxiedFeedUrl = PROXY_URL + publicFeedUrl;
-
-                try {
-                    const response = await fetch(proxiedFeedUrl);
-                    if (!response.ok) {
-                        throw new Error(`Server returned status ${response.status}`);
-                    }
-                    const dataText = await response.text();
-                    
-                    // Handle potential non-JSON responses from the proxy on error
-                    let feedData;
-                    try {
-                        feedData = JSON.parse(dataText);
-                    } catch (jsonError) {
-                         throw new Error(`Failed to parse response from server. It might be down or blocking requests.`);
-                    }
-
-
-                    if (!feedData || feedData.length === 0) {
-                        modalBody.innerHTML = '<p>No public posts found.</p>';
-                        return;
-                    }
-                    
-                    // Clear loading message
-                    modalBody.innerHTML = '';
-                    
-                    // Render each post
-                    feedData.forEach(post => {
-                        const postDiv = document.createElement('div');
-                        postDiv.className = 'post';
-                        
-                        const author = document.createElement('div');
-                        author.className = 'post-author';
-                        author.textContent = post.account.display_name || post.account.username;
-                        
-                        const content = document.createElement('div');
-                        content.className = 'post-content';
-                        // Sanitize and set the post's HTML content
-                        content.innerHTML = sanitizeHTML(post.content);
-                        
-                        postDiv.appendChild(author);
-                        postDiv.appendChild(content);
-                        modalBody.appendChild(postDiv);
-                    });
-
-                } catch (error) {
-                    modalBody.innerHTML = `<p><strong>Error loading feed:</strong> ${error.message}</p>`;
-                    console.error('Error fetching public feed:', error);
-                }
-            }
-            
-            // --- Event listeners to close the modal ---
-            modalClose.onclick = () => {
-                modal.style.display = 'none';
-            };
-            
-            // Close if user clicks outside the modal content
-            window.onclick = (event) => {
-                if (event.target == modal) {
-                    modal.style.display = 'none';
-                }
-            };
-
-
-            // --- MODIFIED: renderServers function ---
-            function renderServers(serversToRender) {
-                serverList.innerHTML = ''; 
-                
-                if (serversToRender.length === 0 && allServers.length > 0) {
-                    serverList.innerHTML = '<li>No matching servers found.</li>';
-                    return;
-                }
-                if (allServers.length === 0) {
-                     serverList.innerHTML = '<li>Loading servers...</li>';
-                    return;
-                }
-
-                // Get a list of favorite names for easy checking
-                const favoriteNames = currentFavorites.map(f => f.name);
-
-                serversToRender.forEach(server => {
-                    if (!server.info) {
-                        return;
-                    }
-
-                    const li = document.createElement('li');
-                    li.className = 'server-list-item';
-
-                    // 1. The Server Link
-                    const link = document.createElement('a');
-                    link.href = `https://` + server.name;
-                    link.textContent = server.name;
-                    link.target = '_blank';
-                    
-                    // 2. The "View Feed" Button
-                    const feedButton = document.createElement('button');
-                    feedButton.className = 'button-small';
-                    feedButton.textContent = 'View Feed';
-                    feedButton.onclick = () => {
-                        showPublicFeed(server.name);
-                    };
-
-                    // 3. NEW: The "Favorite" Button
-                    const favButton = document.createElement('button');
-                    favButton.className = 'button-small button-fav';
-                    
-                    const isFavorited = favoriteNames.includes(server.name);
-                    
-                    if (isFavorited) {
-                        favButton.textContent = '★'; // Solid star
-                        favButton.title = 'Already in favorites';
-                        favButton.disabled = true;
-                    } else {
-                        favButton.textContent = '☆'; // Outline star
-                        favButton.title = 'Add to favorites';
-                        favButton.disabled = false;
-                        favButton.onclick = () => {
-                            const description = server.info?.short_description || 'No description.';
-                            addFavorite(server.name, description);
-                        };
-                    }
-
-
-                    const description = document.createElement('p');
-                    description.textContent = server.info?.short_description || 'No description available.';
-                    
-                    const stats = document.createElement('span');
-                    stats.textContent = `${server.users} users`;
-                    
-                    li.appendChild(link);
-                    li.appendChild(feedButton); // Add the feed button
-                    li.appendChild(favButton); // Add the favorite button
-                    li.appendChild(description);
-li.appendChild(stats);
-                    
-                    serverList.appendChild(li);
-                });
-            }
-
-            // --- fetchServers function (mostly unchanged) ---
-            async function fetchServers() {
-                try {
-                    const response = await fetch(FETCH_URL);
-                    if (!response.ok) {
-                        throw new Error(`Proxy or API server returned status ${response.status}`);
-                    }
-                    const dataText = await response.text();
-                    const data = JSON.parse(dataText);
-                    
-                    const allInstances = data.instances || []; 
-
-                    allServers = allInstances.filter(server => server.info); // Just make sure it has an info object
-                    
-                    if (allServers.length > 0) {
-                        // Pass the current list of servers to be rendered
-                        const searchTerm = serverSearch.value.toLowerCase();
-                        if (searchTerm) {
-                            filterAndRenderServers(searchTerm);
-                        } else {
-                            renderServers(allServers);
-                        }
-                    } else {
-                        serverList.innerHTML = '<li>No open servers found at this time.</li>';
-                    }
-
-                } catch (error) {
-                    console.error('Error fetching server list:', error);
-                    serverList.innerHTML = `<li><strong>Error loading servers:</strong><br>${error.message}.<br>Please try again later.</li>`;
-                }
-            }
-
-            // --- NEW: Helper function to filter and render
-            function filterAndRenderServers(searchTerm) {
-                const filteredServers = allServers.filter(server => {
-                    const domainMatch = server.name.toLowerCase().includes(searchTerm);
-                    const descriptionMatch = (server.info?.short_description || '').toLowerCase().includes(searchTerm);
-                    return domainMatch || descriptionMatch;
-                });
-                renderServers(filteredServers);
-            }
-
-            // --- Search event listener ---
-            serverSearch.addEventListener('keyup', () => {
-                const searchTerm = serverSearch.value.toLowerCase();
-                filterAndRenderServers(searchTerm);
-            });
-
-            // Initial auth check triggers everything else
-        });
     </script>
-
 </body>
 </html>
